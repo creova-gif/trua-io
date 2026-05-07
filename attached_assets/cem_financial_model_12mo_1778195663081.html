@@ -1,0 +1,186 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.root { padding: 1.5rem 0; font-family: var(--font-sans); color: var(--color-text-primary); }
+.header { margin-bottom: 1.5rem; }
+.label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.big { font-size: 22px; font-weight: 500; }
+.sub { font-size: 12px; color: var(--color-text-secondary); }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.metric { background: var(--color-background-secondary); border-radius: 8px; padding: 1rem; }
+.controls { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+.ctrl-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ctrl-row:last-child { margin-bottom: 0; }
+.ctrl-label { font-size: 13px; min-width: 160px; color: var(--color-text-secondary); }
+.ctrl-val { font-size: 13px; font-weight: 500; min-width: 60px; text-align: right; }
+input[type=range] { flex: 1; }
+.section-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); margin-bottom: 10px; }
+.chart-area { position: relative; height: 200px; margin-bottom: 1.5rem; }
+.bars { display: flex; align-items: flex-end; gap: 6px; height: 180px; }
+.bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 2px; }
+.bar-wrap { display: flex; gap: 2px; align-items: flex-end; width: 100%; }
+.bar { border-radius: 3px 3px 0 0; min-height: 2px; transition: height 0.3s; }
+.bar-s { background: #1D9E75; }
+.bar-g { background: #378ADD; }
+.bar-a { background: #7F77DD; }
+.bar-label { font-size: 10px; color: var(--color-text-secondary); margin-top: 4px; }
+.legend { display: flex; gap: 16px; margin-bottom: 1.5rem; }
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-align: right; padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+th:first-child { text-align: left; }
+td { text-align: right; padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+td:first-child { text-align: left; font-weight: 500; }
+tr.total-row td { background: var(--color-background-secondary); font-weight: 500; border-bottom: none; }
+tr:hover td { background: var(--color-background-secondary); }
+.pos { color: #0F6E56; }
+.neg { color: #A32D2D; }
+</style>
+
+<div class="root">
+  <h2 class="sr-only">AI CEM Platform 12-month financial model with adjustable growth assumptions</h2>
+
+  <div class="header">
+    <div class="label">AI CEM Platform — 12-Month ARR Model</div>
+  </div>
+
+  <div class="controls">
+    <div class="section-title">Growth assumptions</div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Starter new seats/mo</span>
+      <input type="range" min="1" max="20" value="5" step="1" id="s-growth" oninput="recalc()">
+      <span class="ctrl-val" id="s-growth-out">5</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Growth new seats/mo</span>
+      <input type="range" min="1" max="10" value="3" step="1" id="g-growth" oninput="recalc()">
+      <span class="ctrl-val" id="g-growth-out">3</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Agency new seats/mo</span>
+      <input type="range" min="0" max="5" value="1" step="1" id="a-growth" oninput="recalc()">
+      <span class="ctrl-val" id="a-growth-out">1</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Monthly churn rate</span>
+      <input type="range" min="0" max="10" value="3" step="1" id="churn" oninput="recalc()">
+      <span class="ctrl-val" id="churn-out">3%</span>
+    </div>
+  </div>
+
+  <div class="grid-3" id="summary-metrics">
+    <div class="metric"><div class="label">Month 12 MRR</div><div class="big" id="m12-mrr">—</div></div>
+    <div class="metric"><div class="label">Month 12 ARR</div><div class="big" id="m12-arr">—</div></div>
+    <div class="metric"><div class="label">Total seats (M12)</div><div class="big" id="m12-seats">—</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>Starter $49</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#378ADD"></div>Growth $149</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#7F77DD"></div>Agency $399</div>
+  </div>
+
+  <div class="chart-area">
+    <div class="bars" id="chart-bars"></div>
+  </div>
+
+  <div class="section-title">Monthly breakdown</div>
+  <div class="table-wrap">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Starter</th>
+          <th>Growth</th>
+          <th>Agency</th>
+          <th>Seats</th>
+          <th>MRR</th>
+          <th>vs prev</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const PRICES = { s: 49, g: 149, a: 399 };
+const MONTHS = ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
+
+function recalc() {
+  const sg = parseInt(document.getElementById('s-growth').value);
+  const gg = parseInt(document.getElementById('g-growth').value);
+  const ag = parseInt(document.getElementById('a-growth').value);
+  const churn = parseInt(document.getElementById('churn').value) / 100;
+
+  document.getElementById('s-growth-out').textContent = sg;
+  document.getElementById('g-growth-out').textContent = gg;
+  document.getElementById('a-growth-out').textContent = ag;
+  document.getElementById('churn-out').textContent = parseInt(document.getElementById('churn').value) + '%';
+
+  let sSeats = 0, gSeats = 0, aSeats = 0;
+  const rows = [];
+
+  for (let m = 0; m < 12; m++) {
+    sSeats = Math.round(sSeats * (1 - churn) + sg);
+    gSeats = Math.round(gSeats * (1 - churn) + gg);
+    aSeats = Math.round(aSeats * (1 - churn) + ag);
+    const mrr = sSeats * PRICES.s + gSeats * PRICES.g + aSeats * PRICES.a;
+    rows.push({ m: MONTHS[m], s: sSeats, g: gSeats, a: aSeats, mrr });
+  }
+
+  const maxMrr = Math.max(...rows.map(r => r.mrr));
+  const last = rows[11];
+
+  document.getElementById('m12-mrr').textContent = '$' + last.mrr.toLocaleString();
+  document.getElementById('m12-arr').textContent = '$' + (last.mrr * 12).toLocaleString();
+  document.getElementById('m12-seats').textContent = (last.s + last.g + last.a).toLocaleString();
+
+  // Chart
+  const barsEl = document.getElementById('chart-bars');
+  barsEl.innerHTML = '';
+  const maxH = 160;
+  rows.forEach(r => {
+    const total = r.s * PRICES.s + r.g * PRICES.g + r.a * PRICES.a;
+    const scale = maxMrr > 0 ? maxH / maxMrr : 0;
+    const sh = Math.max(2, Math.round(r.s * PRICES.s * scale));
+    const gh = Math.max(2, Math.round(r.g * PRICES.g * scale));
+    const ah = Math.max(2, Math.round(r.a * PRICES.a * scale));
+    barsEl.innerHTML += `<div class="bar-group">
+      <div class="bar-wrap">
+        <div class="bar bar-s" style="height:${sh}px;flex:1"></div>
+        <div class="bar bar-g" style="height:${gh}px;flex:1"></div>
+        <div class="bar bar-a" style="height:${ah}px;flex:1"></div>
+      </div>
+      <div class="bar-label">${r.m}</div>
+    </div>`;
+  });
+
+  // Table
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  rows.forEach((r, i) => {
+    const prev = i > 0 ? rows[i-1].mrr : 0;
+    const diff = r.mrr - prev;
+    const diffStr = i === 0 ? '—' : (diff >= 0 ? '<span class="pos">+$' + diff.toLocaleString() + '</span>' : '<span class="neg">-$' + Math.abs(diff).toLocaleString() + '</span>');
+    tbody.innerHTML += `<tr>
+      <td>${r.m}</td>
+      <td>${r.s}</td>
+      <td>${r.g}</td>
+      <td>${r.a}</td>
+      <td>${r.s + r.g + r.a}</td>
+      <td>$${r.mrr.toLocaleString()}</td>
+      <td>${diffStr}</td>
+    </tr>`;
+  });
+
+  // Total row
+  const totalMrr = rows.reduce((s, r) => s + r.mrr, 0);
+  tbody.innerHTML += `<tr class="total-row"><td>Total</td><td>—</td><td>—</td><td>—</td><td>—</td><td>$${totalMrr.toLocaleString()}</td><td>—</td></tr>`;
+}
+
+recalc();
+</script>

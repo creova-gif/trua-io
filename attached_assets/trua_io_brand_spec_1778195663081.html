@@ -1,0 +1,161 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.root { padding: 1.5rem 0; font-family: var(--font-sans); color: var(--color-text-primary); }
+.section-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-text-secondary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+.label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.value { font-size: 14px; font-weight: 500; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.swatch-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.swatch { border-radius: 8px; padding: 10px 12px; min-width: 90px; }
+.swatch-name { font-size: 11px; font-weight: 500; margin-bottom: 2px; }
+.swatch-hex { font-size: 10px; font-family: var(--font-mono); }
+.logo-preview { display: flex; align-items: center; gap: 10px; padding: 1.25rem; border-radius: 12px; background: var(--color-background-secondary); margin-bottom: 10px; }
+.logo-icon { width: 36px; height: 36px; border-radius: 8px; background: #1D9E75; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.logo-wordmark { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+.logo-dot { color: #1D9E75; }
+.logo-preview-dark { background: #1a1a18; }
+.logo-icon-dark { background: #1D9E75; }
+.tagline { font-size: 12px; color: var(--color-text-secondary); font-style: italic; margin-top: 4px; }
+.type-sample { margin-bottom: 12px; }
+.type-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.voice-card { border-left: 3px solid #1D9E75; border-radius: 0 8px 8px 0; padding: 10px 14px; background: var(--color-background-secondary); margin-bottom: 8px; }
+.voice-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.voice-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+.email-preview { background: var(--color-background-secondary); border-radius: 12px; padding: 1rem; font-size: 13px; }
+.ep-from { font-weight: 500; margin-bottom: 2px; }
+.ep-subject { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.ep-body { color: var(--color-text-secondary); line-height: 1.6; }
+.ep-sig { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--color-border-tertiary); font-size: 12px; color: var(--color-text-secondary); }
+.teal { color: #1D9E75; }
+</style>
+
+<div class="root">
+  <div style="margin-bottom:1.75rem;">
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px;">Brand identity system</div>
+    <div style="font-size:22px;font-weight:500;">Trua IO</div>
+    <div style="font-size:14px;color:var(--color-text-secondary);">AI-powered outreach. Autonomous. Personalized. Always on.</div>
+  </div>
+
+  <div class="section-title">Logo system</div>
+  <div class="logo-preview">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="3" fill="white"/>
+        <path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M5.5 5.5l1.5 1.5M13 13l1.5 1.5M5.5 14.5l1.5-1.5M13 7l1.5-1.5" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-wordmark">Trua<span class="logo-dot"> IO</span></div>
+      <div class="tagline">Light mode — primary</div>
+    </div>
+  </div>
+  <div class="logo-preview logo-preview-dark">
+    <div class="logo-icon logo-icon-dark">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="3" fill="white"/>
+        <path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M5.5 5.5l1.5 1.5M13 13l1.5 1.5M5.5 14.5l1.5-1.5M13 7l1.5-1.5" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-wordmark" style="color:white;">Trua<span style="color:#1D9E75;"> IO</span></div>
+      <div class="tagline" style="color:#888780;">Dark mode — primary</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:1.5rem;">Color tokens</div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#000000;">
+      <div class="swatch-name" style="color:#9FE1CB;">Black</div>
+      <div class="swatch-hex" style="color:#5DCAA5;">#000000</div>
+      <div style="font-size:10px;color:#5DCAA5;margin-top:4px;">Primary</div>
+    </div>
+    <div class="swatch" style="background:#1D9E75;">
+      <div class="swatch-name" style="color:#E1F5EE;">Electric Teal</div>
+      <div class="swatch-hex" style="color:#9FE1CB;">#1D9E75</div>
+      <div style="font-size:10px;color:#9FE1CB;margin-top:4px;">Accent</div>
+    </div>
+    <div class="swatch" style="background:#9FE1CB;">
+      <div class="swatch-name" style="color:#085041;">Soft Teal</div>
+      <div class="swatch-hex" style="color:#0F6E56;">#9FE1CB</div>
+      <div style="font-size:10px;color:#0F6E56;margin-top:4px;">Light accent</div>
+    </div>
+    <div class="swatch" style="background:#F1EFE8;border:0.5px solid #D3D1C7;">
+      <div class="swatch-name" style="color:#2C2C2A;">Off-white</div>
+      <div class="swatch-hex" style="color:#5F5E5A;">#F1EFE8</div>
+      <div style="font-size:10px;color:#5F5E5A;margin-top:4px;">Surface light</div>
+    </div>
+    <div class="swatch" style="background:#2C2C2A;">
+      <div class="swatch-name" style="color:#D3D1C7;">Dark Gray</div>
+      <div class="swatch-hex" style="color:#888780;">#2C2C2A</div>
+      <div style="font-size:10px;color:#888780;margin-top:4px;">Surface dark</div>
+    </div>
+    <div class="swatch" style="background:#E24B4A;">
+      <div class="swatch-name" style="color:#FCEBEB;">Error</div>
+      <div class="swatch-hex" style="color:#F7C1C1;">#E24B4A</div>
+      <div style="font-size:10px;color:#F7C1C1;margin-top:4px;">Danger</div>
+    </div>
+  </div>
+
+  <div class="section-title">CSS design tokens</div>
+  <div class="card" style="font-family:var(--font-mono);font-size:12px;line-height:2;">
+    <div>--color-brand-black: #000000;</div>
+    <div>--color-brand-teal: #1D9E75;</div>
+    <div>--color-brand-teal-light: #9FE1CB;</div>
+    <div>--color-brand-teal-pale: #E1F5EE;</div>
+    <div>--color-surface-light: #F1EFE8;</div>
+    <div>--color-surface-dark: #2C2C2A;</div>
+    <div>--font-display: 'Sora', sans-serif;</div>
+    <div>--font-body: 'DM Sans', sans-serif;</div>
+    <div>--radius-sm: 6px;</div>
+    <div>--radius-md: 10px;</div>
+    <div>--radius-lg: 16px;</div>
+  </div>
+
+  <div class="section-title" style="margin-top:1.5rem;">Typography scale</div>
+  <div class="type-sample">
+    <div class="type-label">Display — Sora 500</div>
+    <div style="font-size:28px;font-weight:500;letter-spacing:-0.02em;">Outreach that converts.</div>
+  </div>
+  <div class="type-sample">
+    <div class="type-label">Heading — DM Sans 500</div>
+    <div style="font-size:18px;font-weight:500;">Campaign performance overview</div>
+  </div>
+  <div class="type-sample">
+    <div class="type-label">Body — DM Sans 400</div>
+    <div style="font-size:14px;line-height:1.7;color:var(--color-text-secondary);">Trua IO generates and sends personalized outreach emails to Tanzanian businesses, 24 hours a day, 7 days a week — without human intervention.</div>
+  </div>
+  <div class="type-sample">
+    <div class="type-label">Mono — system mono</div>
+    <div style="font-size:13px;font-family:var(--font-mono);color:#1D9E75;">open_rate: 78.4% · sent: 1,240 · replied: 96</div>
+  </div>
+
+  <div class="section-title" style="margin-top:1.5rem;">Brand voice guidelines</div>
+  <div class="voice-card">
+    <div class="voice-title">Professional & authoritative</div>
+    <div class="voice-body">Write with confidence. No hedging, no filler. Every sentence earns its place. Use active voice. Treat the reader as a competent business professional.</div>
+  </div>
+  <div class="voice-card">
+    <div class="voice-title">Culturally grounded</div>
+    <div class="voice-body">Reference Tanzanian cities, industries, and business culture naturally. Never condescending. Swahili phrases welcome where appropriate. Acknowledge the EAC market context.</div>
+  </div>
+  <div class="voice-card">
+    <div class="voice-title">Outcome-first</div>
+    <div class="voice-body">Lead with results, not features. "Book 3× more meetings" beats "AI email drafting engine." Every user-facing message should answer: what does this do for me?</div>
+  </div>
+
+  <div class="section-title" style="margin-top:1.5rem;">Sample AI-generated email (Trua IO output)</div>
+  <div class="email-preview">
+    <div class="ep-from">From: <span class="teal">James Mwangi</span> via Trua IO &lt;james@logistics-tz.co.tz&gt;</div>
+    <div class="ep-subject">Reducing Dar es Salaam last-mile delays — a question for Karibu Logistics</div>
+    <div class="ep-body">Dear Mr. Osei,<br><br>I noticed Karibu Logistics recently expanded its Arusha–Mwanza corridor — a strong move given the Northern Corridor growth in Q1. We work with logistics companies across Dar es Salaam to reduce last-mile delays by 30% using route optimization tools built for Tanzania's road network.<br><br>Would a 20-minute call this week make sense? I can show you how three similar companies cut delivery exceptions by half in 60 days.</div>
+    <div class="ep-sig">
+      James Mwangi · Head of Sales · Karibu Logistics Ltd<br>
+      <span class="teal">Sent via Trua IO</span> · <a href="#" style="color:var(--color-text-secondary);font-size:11px;">Unsubscribe</a>
+    </div>
+  </div>
+</div>

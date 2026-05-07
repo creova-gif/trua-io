@@ -3,13 +3,28 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Trua IO API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: contacts
+    description: Contact management
+  - name: campaigns
+    description: Campaign management
+  - name: emails
+    description: Email operations
+  - name: analytics
+    description: Analytics and reporting
+  - name: templates
+    description: Email template management
+  - name: organization
+    description: Organization management
+  - name: anthropic
+    description: Anthropic AI chat operations
+
 paths:
   /healthz:
     get:
@@ -24,6 +39,714 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── ORGANIZATION ──────────────────────────────────────────────────────────
+  /org/me:
+    get:
+      operationId: getMyOrg
+      tags: [organization]
+      summary: Get current organization
+      responses:
+        "200":
+          description: Organization details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      operationId: updateMyOrg
+      tags: [organization]
+      summary: Update organization settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrgBody"
+      responses:
+        "200":
+          description: Updated organization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+
+  # ── CONTACTS ──────────────────────────────────────────────────────────────
+  /contacts:
+    get:
+      operationId: listContacts
+      tags: [contacts]
+      summary: List contacts with filtering and search
+      parameters:
+        - name: stage
+          in: query
+          schema:
+            type: string
+        - name: industry
+          in: query
+          schema:
+            type: string
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated contact list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactListResponse"
+    post:
+      operationId: createContact
+      tags: [contacts]
+      summary: Create a single contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContactBody"
+      responses:
+        "201":
+          description: Created contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /contacts/import:
+    post:
+      operationId: importContacts
+      tags: [contacts]
+      summary: Import contacts from CSV data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportContactsBody"
+      responses:
+        "200":
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+
+  /contacts/{id}:
+    get:
+      operationId: getContact
+      tags: [contacts]
+      summary: Get a contact by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      operationId: updateContact
+      tags: [contacts]
+      summary: Update a contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContactBody"
+      responses:
+        "200":
+          description: Updated contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      operationId: deleteContact
+      tags: [contacts]
+      summary: Delete a contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /contacts/{id}/enrich:
+    post:
+      operationId: enrichContact
+      tags: [contacts]
+      summary: AI-enrich contact with company data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Enriched contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  # ── CAMPAIGNS ─────────────────────────────────────────────────────────────
+  /campaigns:
+    get:
+      operationId: listCampaigns
+      tags: [campaigns]
+      summary: List campaigns
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Campaign list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Campaign"
+    post:
+      operationId: createCampaign
+      tags: [campaigns]
+      summary: Create a campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCampaignBody"
+      responses:
+        "201":
+          description: Created campaign
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+
+  /campaigns/{id}:
+    get:
+      operationId: getCampaign
+      tags: [campaigns]
+      summary: Get a campaign by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      operationId: updateCampaign
+      tags: [campaigns]
+      summary: Update a campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCampaignBody"
+      responses:
+        "200":
+          description: Updated campaign
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      operationId: deleteCampaign
+      tags: [campaigns]
+      summary: Delete a campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /campaigns/{id}/run:
+    post:
+      operationId: runCampaign
+      tags: [campaigns]
+      summary: Start running a campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /campaigns/{id}/pause:
+    post:
+      operationId: pauseCampaign
+      tags: [campaigns]
+      summary: Pause a running campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign paused
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  # ── EMAILS ────────────────────────────────────────────────────────────────
+  /emails:
+    get:
+      operationId: listEmails
+      tags: [emails]
+      summary: List sent emails
+      parameters:
+        - name: campaignId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Email list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailListResponse"
+
+  /emails/draft:
+    post:
+      operationId: draftEmail
+      tags: [emails]
+      summary: Generate AI-drafted email for a contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DraftEmailBody"
+      responses:
+        "200":
+          description: AI-generated email draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDraft"
+
+  /emails/send:
+    post:
+      operationId: sendEmail
+      tags: [emails]
+      summary: Send a single email to a contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendEmailBody"
+      responses:
+        "201":
+          description: Email queued/sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+
+  /emails/{id}:
+    get:
+      operationId: getEmail
+      tags: [emails]
+      summary: Get an email record by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  # ── ANALYTICS ─────────────────────────────────────────────────────────────
+  /analytics/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [analytics]
+      summary: Get dashboard summary metrics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /analytics/contacts/stages:
+    get:
+      operationId: getContactStageBreakdown
+      tags: [analytics]
+      summary: Get contact count by stage
+      responses:
+        "200":
+          description: Stage breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StageCount"
+
+  /analytics/emails/timeline:
+    get:
+      operationId: getEmailTimeline
+      tags: [analytics]
+      summary: Get email send timeline over last 30 days
+      responses:
+        "200":
+          description: Email timeline data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelinePoint"
+
+  /analytics/campaigns/{id}:
+    get:
+      operationId: getCampaignStats
+      tags: [analytics]
+      summary: Get performance stats for a campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignStats"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  # ── TEMPLATES ─────────────────────────────────────────────────────────────
+  /templates:
+    get:
+      operationId: listTemplates
+      tags: [templates]
+      summary: List email templates
+      responses:
+        "200":
+          description: Template list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailTemplate"
+    post:
+      operationId: createTemplate
+      tags: [templates]
+      summary: Create a custom email template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplateBody"
+      responses:
+        "201":
+          description: Created template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+
+  /templates/{id}:
+    delete:
+      operationId: deleteTemplate
+      tags: [templates]
+      summary: Delete a template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── ANTHROPIC AI BOT ──────────────────────────────────────────────────────
+  /anthropic/conversations:
+    get:
+      operationId: listAnthropicConversations
+      tags: [anthropic]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnthropicConversation"
+    post:
+      operationId: createAnthropicConversation
+      tags: [anthropic]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnthropicConversationBody"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnthropicConversation"
+
+  /anthropic/conversations/{id}:
+    get:
+      operationId: getAnthropicConversation
+      tags: [anthropic]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnthropicConversationWithMessages"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnthropicError"
+    delete:
+      operationId: deleteAnthropicConversation
+      tags: [anthropic]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnthropicError"
+
+  /anthropic/conversations/{id}/messages:
+    get:
+      operationId: listAnthropicMessages
+      tags: [anthropic]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnthropicMessage"
+    post:
+      operationId: sendAnthropicMessage
+      tags: [anthropic]
+      summary: Send a message and receive an AI response (SSE stream)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendAnthropicMessageBody"
+      responses:
+        "200":
+          description: SSE stream of assistant response chunks
+          content:
+            text/event-stream: {}
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +757,731 @@ components:
       required:
         - status
 
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    # ── ORGANIZATION ──────────────────────────────────────────────────────
+    Organization:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        plan:
+          type: string
+        fromName:
+          type: string
+        fromEmail:
+          type: ["string", "null"]
+        domain:
+          type: ["string", "null"]
+        locale:
+          type: string
+        timezone:
+          type: string
+        dailySendLimit:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - slug
+        - plan
+        - fromName
+        - locale
+        - timezone
+        - dailySendLimit
+        - createdAt
+
+    UpdateOrgBody:
+      type: object
+      properties:
+        name:
+          type: string
+        fromName:
+          type: string
+        fromEmail:
+          type: string
+        domain:
+          type: string
+        locale:
+          type: string
+        dailySendLimit:
+          type: integer
+
+    # ── CONTACTS ──────────────────────────────────────────────────────────
+    Contact:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        firstName:
+          type: ["string", "null"]
+        lastName:
+          type: ["string", "null"]
+        jobTitle:
+          type: ["string", "null"]
+        companyName:
+          type: ["string", "null"]
+        companySize:
+          type: ["string", "null"]
+        industry:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        country:
+          type: string
+        website:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        linkedinUrl:
+          type: ["string", "null"]
+        stage:
+          type: string
+        leadScore:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        notes:
+          type: ["string", "null"]
+        optedIn:
+          type: boolean
+        optedOut:
+          type: boolean
+        enriched:
+          type: boolean
+        lastContacted:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - stage
+        - leadScore
+        - tags
+        - optedIn
+        - optedOut
+        - enriched
+        - country
+        - createdAt
+        - updatedAt
+
+    ContactListResponse:
+      type: object
+      properties:
+        contacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contact"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - contacts
+        - total
+        - page
+        - limit
+
+    CreateContactBody:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        jobTitle:
+          type: string
+        companyName:
+          type: string
+        companySize:
+          type: string
+        industry:
+          type: string
+        city:
+          type: string
+        website:
+          type: string
+        phone:
+          type: string
+        linkedinUrl:
+          type: string
+        notes:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        optedIn:
+          type: boolean
+      required:
+        - email
+
+    UpdateContactBody:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        jobTitle:
+          type: string
+        companyName:
+          type: string
+        companySize:
+          type: string
+        industry:
+          type: string
+        city:
+          type: string
+        website:
+          type: string
+        phone:
+          type: string
+        linkedinUrl:
+          type: string
+        stage:
+          type: string
+        leadScore:
+          type: integer
+        notes:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        optedIn:
+          type: boolean
+        optedOut:
+          type: boolean
+
+    ImportContactsBody:
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+        fieldMap:
+          type: object
+          additionalProperties:
+            type: string
+        duplicateAction:
+          type: string
+      required:
+        - rows
+        - fieldMap
+
+    ImportResult:
+      type: object
+      properties:
+        imported:
+          type: integer
+        skipped:
+          type: integer
+        errors:
+          type: integer
+        errorRows:
+          type: array
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+              reason:
+                type: string
+            required:
+              - row
+              - reason
+      required:
+        - imported
+        - skipped
+        - errors
+        - errorRows
+
+    # ── CAMPAIGNS ─────────────────────────────────────────────────────────
+    Campaign:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        status:
+          type: string
+        language:
+          type: string
+        aiGenerated:
+          type: boolean
+        subjectLine:
+          type: ["string", "null"]
+        sentCount:
+          type: integer
+        deliveredCount:
+          type: integer
+        openedCount:
+          type: integer
+        clickedCount:
+          type: integer
+        repliedCount:
+          type: integer
+        bouncedCount:
+          type: integer
+        unsubscribedCount:
+          type: integer
+        targetCount:
+          type: integer
+        scheduledAt:
+          type: ["string", "null"]
+          format: date-time
+        completedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - status
+        - language
+        - aiGenerated
+        - sentCount
+        - deliveredCount
+        - openedCount
+        - clickedCount
+        - repliedCount
+        - bouncedCount
+        - unsubscribedCount
+        - targetCount
+        - createdAt
+        - updatedAt
+
+    CreateCampaignBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        language:
+          type: string
+        subjectLine:
+          type: string
+        bodyHtml:
+          type: string
+        segmentFilter:
+          type: object
+          additionalProperties: true
+        scheduledAt:
+          type: string
+          format: date-time
+      required:
+        - name
+
+    UpdateCampaignBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        language:
+          type: string
+        subjectLine:
+          type: string
+        bodyHtml:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+
+    # ── EMAILS ────────────────────────────────────────────────────────────
+    Email:
+      type: object
+      properties:
+        id:
+          type: integer
+        campaignId:
+          type: ["integer", "null"]
+        contactId:
+          type: integer
+        subject:
+          type: string
+        toEmail:
+          type: string
+        fromEmail:
+          type: string
+        fromName:
+          type: string
+        status:
+          type: string
+        opened:
+          type: boolean
+        clicked:
+          type: boolean
+        replied:
+          type: boolean
+        bounced:
+          type: boolean
+        unsubscribed:
+          type: boolean
+        aiGenerated:
+          type: boolean
+        sentAt:
+          type: ["string", "null"]
+          format: date-time
+        openedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - contactId
+        - subject
+        - toEmail
+        - fromEmail
+        - fromName
+        - status
+        - opened
+        - clicked
+        - replied
+        - bounced
+        - unsubscribed
+        - aiGenerated
+        - createdAt
+
+    EmailListResponse:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Email"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - emails
+        - total
+        - page
+        - limit
+
+    EmailDraft:
+      type: object
+      properties:
+        subjectLine:
+          type: string
+        bodyHtml:
+          type: string
+        bodyText:
+          type: string
+        language:
+          type: string
+      required:
+        - subjectLine
+        - bodyHtml
+        - bodyText
+        - language
+
+    DraftEmailBody:
+      type: object
+      properties:
+        contactId:
+          type: integer
+        language:
+          type: string
+        templateId:
+          type: integer
+        tone:
+          type: string
+      required:
+        - contactId
+
+    SendEmailBody:
+      type: object
+      properties:
+        contactId:
+          type: integer
+        subject:
+          type: string
+        bodyHtml:
+          type: string
+        bodyText:
+          type: string
+        campaignId:
+          type: integer
+      required:
+        - contactId
+        - subject
+        - bodyHtml
+
+    # ── ANALYTICS ─────────────────────────────────────────────────────────
+    DashboardStats:
+      type: object
+      properties:
+        totalContacts:
+          type: integer
+        totalCampaigns:
+          type: integer
+        emailsSentThisMonth:
+          type: integer
+        avgOpenRate:
+          type: number
+        avgReplyRate:
+          type: number
+        activeCampaigns:
+          type: integer
+        hotLeads:
+          type: integer
+        qualifiedLeads:
+          type: integer
+        recentCampaigns:
+          type: array
+          items:
+            $ref: "#/components/schemas/Campaign"
+      required:
+        - totalContacts
+        - totalCampaigns
+        - emailsSentThisMonth
+        - avgOpenRate
+        - avgReplyRate
+        - activeCampaigns
+        - hotLeads
+        - qualifiedLeads
+        - recentCampaigns
+
+    StageCount:
+      type: object
+      properties:
+        stage:
+          type: string
+        count:
+          type: integer
+      required:
+        - stage
+        - count
+
+    TimelinePoint:
+      type: object
+      properties:
+        date:
+          type: string
+        sent:
+          type: integer
+        opened:
+          type: integer
+        replied:
+          type: integer
+      required:
+        - date
+        - sent
+        - opened
+        - replied
+
+    CampaignStats:
+      type: object
+      properties:
+        campaignId:
+          type: integer
+        openRate:
+          type: number
+        replyRate:
+          type: number
+        bounceRate:
+          type: number
+        unsubscribeRate:
+          type: number
+        clickRate:
+          type: number
+        deliveryRate:
+          type: number
+        topSubjectLines:
+          type: array
+          items:
+            type: string
+      required:
+        - campaignId
+        - openRate
+        - replyRate
+        - bounceRate
+        - unsubscribeRate
+        - clickRate
+        - deliveryRate
+        - topSubjectLines
+
+    # ── TEMPLATES ─────────────────────────────────────────────────────────
+    EmailTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        industry:
+          type: string
+        tone:
+          type: string
+        language:
+          type: string
+        subjectLine:
+          type: string
+        bodyHtml:
+          type: string
+        isDefault:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - industry
+        - tone
+        - language
+        - subjectLine
+        - bodyHtml
+        - isDefault
+        - createdAt
+
+    CreateTemplateBody:
+      type: object
+      properties:
+        name:
+          type: string
+        industry:
+          type: string
+        tone:
+          type: string
+        language:
+          type: string
+        subjectLine:
+          type: string
+        bodyHtml:
+          type: string
+      required:
+        - name
+        - subjectLine
+        - bodyHtml
+
+    # ── ANTHROPIC ─────────────────────────────────────────────────────────
+    AnthropicConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - createdAt
+
+    AnthropicMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: integer
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    CreateAnthropicConversationBody:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    SendAnthropicMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    AnthropicConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnthropicMessage"
+      required:
+        - id
+        - title
+        - createdAt
+        - messages
+
+    AnthropicError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
