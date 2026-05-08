@@ -7,6 +7,7 @@ import analyticsRouter from "./analytics";
 import templatesRouter from "./templates";
 import orgRouter from "./org";
 import anthropicRouter from "./anthropic";
+import teamRouter from "./team";
 
 const router: IRouter = Router();
 
@@ -17,6 +18,7 @@ router.use(emailsRouter);
 router.use(analyticsRouter);
 router.use(templatesRouter);
 router.use(orgRouter);
+router.use(teamRouter);
 router.use(anthropicRouter);
 
 export default router;
