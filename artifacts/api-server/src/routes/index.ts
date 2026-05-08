@@ -8,6 +8,7 @@ import templatesRouter from "./templates";
 import orgRouter from "./org";
 import anthropicRouter from "./anthropic";
 import teamRouter from "./team";
+import complianceRouter from "./compliance";
 
 const router: IRouter = Router();
 
@@ -19,6 +20,7 @@ router.use(analyticsRouter);
 router.use(templatesRouter);
 router.use(orgRouter);
 router.use(teamRouter);
+router.use(complianceRouter);
 router.use(anthropicRouter);
 
 export default router;

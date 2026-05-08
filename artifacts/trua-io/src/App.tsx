@@ -15,6 +15,7 @@ import Emails from "@/pages/Emails";
 import Analytics from "@/pages/Analytics";
 import AiBot from "@/pages/AiBot";
 import Settings from "@/pages/Settings";
+import Compliance from "@/pages/Compliance";
 import LandingPage from "@/pages/LandingPage";
 
 const queryClient = new QueryClient();
@@ -190,6 +191,7 @@ function AppRouter() {
             <Route path="/analytics" component={() => <ProtectedRoute component={Analytics} />} />
             <Route path="/ai-bot" component={() => <ProtectedRoute component={AiBot} />} />
             <Route path="/settings" component={() => <ProtectedRoute component={Settings} />} />
+            <Route path="/compliance" component={() => <ProtectedRoute component={Compliance} />} />
             <Route component={NotFound} />
           </Switch>
           <Toaster />

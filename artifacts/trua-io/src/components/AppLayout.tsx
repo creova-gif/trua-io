@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/emails", label: "Emails", icon: Mail },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/ai-bot", label: "AI Assistant", icon: Bot },
+  { href: "/compliance", label: "Compliance", icon: ShieldCheck },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
