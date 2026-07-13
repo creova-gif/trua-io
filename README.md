@@ -50,11 +50,13 @@ This is conceptually related to `CanCompliance` (both deal with Canadian anti-sp
 ### Installation
 
 ```bash
-git clone https://github.com/creova-gif/Trua-IO.git
-cd Trua-IO
+git clone https://github.com/creova-gif/trua-io.git
+cd trua-io
 pnpm install
 pnpm run build
 ```
+
+Run the app locally with `pnpm --filter @workspace/trua-io run dev` and the API server with `pnpm --filter @workspace/api-server run dev`.
 
 ---
 
