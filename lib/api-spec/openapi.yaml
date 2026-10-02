@@ -633,7 +633,7 @@ paths:
     get:
       operationId: listAnthropicConversations
       tags: [anthropic]
-      summary: List all conversations
+      summary: List conversations for the signed-in organization
       responses:
         "200":
           description: List of conversations
