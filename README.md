@@ -5,73 +5,62 @@
 [![Status](https://img.shields.io/badge/status-active_development-yellow)]()
 [![License](https://img.shields.io/badge/license-proprietary-red)]()
 
----
+## Overview
 
-## What this is
+A multi-tenant email marketing and CRM platform where compliance is tracked as ongoing progress alongside campaigns, not an afterthought.
 
-Trua is a multi-tenant (organization-based) email marketing and CRM platform where compliance isn't an afterthought — it's tracked as ongoing progress alongside the campaigns themselves. Each organization manages its own contacts, campaigns, email templates, and team, with AI assistance (Anthropic) built into the workflow and compliance progress tracked per-org rather than checked once and forgotten.
+## Problem
 
-This is conceptually related to `CanCompliance` (both deal with Canadian anti-spam/compliance concerns) but structured differently — Trua is a full multi-tenant campaign platform with compliance as one tracked dimension, while CanCompliance is a standalone compliance-scanning tool. Worth clarifying whether these are meant to converge, stay separate, or if one supersedes the other.
+Organizations running email marketing campaigns need to track CASL/anti-spam compliance, but most CRM/campaign tools treat compliance as a separate, manual checklist rather than integrating it into the campaign workflow itself.
 
----
+## Solution
 
-## Core Features
+Each organization manages its own contacts, campaigns, and email templates with compliance progress tracked natively, in a properly multi-tenant architecture with real API-layer authorization.
 
-- **Multi-tenant organizations** — each org has isolated contacts, campaigns, and team
-- **Campaigns** — email campaign creation and management
-- **Contacts** — contact list management
-- **Email templates** — reusable template library
-- **Compliance progress tracking** — ongoing compliance status per organization, not a one-time check
-- **Analytics** — campaign performance tracking
-- **AI assistance** — Anthropic-powered features in the campaign workflow
-- **Team management** — multi-user access per organization
+## Architecture
 
----
+Pnpm monorepo. Authentication is Clerk-based, not Supabase Auth — real authorization lives entirely in the Node API server's `authMiddleware`, which resolves organization ID from a database membership lookup, never from client input (verified across all 8 route files). Thirteen real business tables (campaigns, contacts, conversations, emails, organizations, members, etc.) previously had anon/authenticated grants that would have exposed them to unauthenticated CRUD if RLS were ever disabled — these grants have been revoked.
 
-## Tech Stack
+## Technology Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Node.js + Express, pnpm monorepo |
-| Database / ORM | Drizzle ORM |
-| Auth | Custom auth middleware (org-scoped) |
-| AI | Anthropic |
+| Monorepo | pnpm workspaces |
+| Backend | Node (`artifacts/api-server`) |
+| Auth | Clerk |
+| Database | Supabase Postgres |
 
----
-
-## Getting Started (Local Dev)
-
-### Prerequisites
-- Node.js 18+
-- **pnpm** (enforced via preinstall check)
-- A database configured for Drizzle ORM
-- Anthropic API key for AI features
-
-### Installation
+## Getting Started
 
 ```bash
-git clone https://github.com/creova-gif/trua-io.git
-cd trua-io
-pnpm install
-pnpm run build
+pnpm install --frozen-lockfile
+pnpm build
 ```
 
-Run the app locally with `pnpm --filter @workspace/trua-io run dev` and the API server with `pnpm --filter @workspace/api-server run dev`.
+## Security
 
----
+Because auth is Clerk-based, standard `auth.uid()`-based RLS policies won't work without additional Clerk↔Supabase JWT integration, which is not currently set up. The API server's middleware is the actual security boundary — treat it as such, not the database's RLS layer.
 
-## Roadmap / Status
+## Project Status
 
-Core routes implemented: analytics, campaigns, compliance (progress tracking), contacts, emails, org, team, templates, plus Anthropic integration. A `.env.example` should be added for onboarding.
+Active development. Real business logic and real authorization exist; the RLS gap has been closed at the grants level (anon/authenticated access revoked), though defense-in-depth RLS policies proper would require the Clerk JWT integration.
+
+## Roadmap
+
+- [ ] Clerk↔Supabase JWT integration for real RLS policies (optional hardening, not currently blocking)
 
 ## Contributing
 
-This is a private, proprietary CREOVA product. External contributions are not accepted at this time.
+Private, proprietary CREOVA product.
 
 ## License
 
-Proprietary — All Rights Reserved. See `LICENSE`.
+Proprietary — All Rights Reserved.
 
-## Credits
+## Author / Organization
 
-Built by CREOVA. Product lead: Justin Mafie.
+Built by [Justin Mafie](https://github.com/creova-gif) under CREOVA.
+
+## Documentation
+
+See `CLAUDE.md` for AI-agent-specific notes on the Clerk auth boundary.
