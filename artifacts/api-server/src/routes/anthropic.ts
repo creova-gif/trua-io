@@ -224,8 +224,10 @@ export function createAnthropicRouter(deps?: {
         },
         onError(err) {
           req.log.error({ err }, "Anthropic stream error");
-          res.write(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`);
-          res.end();
+          if (!res.writableEnded) {
+            res.write(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`);
+            res.end();
+          }
         },
       });
     },
